@@ -1,114 +1,176 @@
-/* General Styles */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
+* {
     margin: 0;
-    padding: 50px 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
 }
 
-.container {
-    background: #fff;
-    padding: 25px;
-    border-radius: 15px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-/* Input Section */
-.task-input {
+body {
+    background: #0f172a;
+    color: #e2e8f0;
     display: flex;
-    gap: 10px;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    background: #111827;
+    padding: 20px;
+    position: fixed;
+}
+
+.sidebar h2 {
     margin-bottom: 20px;
 }
 
-.task-input input[type="text"] {
-    flex: 2;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    outline: none;
+.sidebar ul {
+    list-style: none;
 }
 
-.task-input input[type="time"] {
-    flex: 1;
+.sidebar ul li {
     padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-.task-input button {
-    padding: 10px 15px;
-    border: none;
-    background: #4CAF50;
-    color: white;
-    font-weight: bold;
+    margin-bottom: 8px;
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.3s;
 }
 
-.task-input button:hover {
-    background: #45a049;
+.sidebar ul li:hover {
+    background: #1f2937;
+}
+
+/* Main */
+.main {
+    margin-left: 240px;
+    padding: 20px;
+    width: 100%;
+}
+
+/* Header */
+.header {
+    margin-bottom: 20px;
+}
+
+/* Stats */
+.stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.card {
+    flex: 1;
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* Inputs */
+.task-input, .controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+input, select {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: #1f2937;
+    color: white;
+}
+
+/* Button */
+button {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: none;
+    background: #6366f1;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #4f46e5;
 }
 
 /* Task List */
 ul {
     list-style: none;
-    padding: 0;
 }
 
 li {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f9f9f9;
-    padding: 12px 15px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: 0.2s;
 }
 
-li.completed {
+li:hover {
+    background: #273449;
+}
+
+/* Completed */
+.completed {
     text-decoration: line-through;
-    color: gray;
-    opacity: 0.7;
+    opacity: 0.6;
 }
 
-li div button {
-    background: none;
-    border: none;
-    font-size: 18px;
+/* Priority */
+.low { border-left: 5px solid #16a34a; }
+.medium { border-left: 5px solid #f59e0b; }
+.high { border-left: 5px solid #ef4444; }
+
+/* Task text */
+.task-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-title {
+    font-weight: bold;
+}
+
+.task-meta {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* Actions */
+.actions button {
     margin-left: 5px;
-    cursor: pointer;
+    background: #334155;
 }
 
-li div button:hover {
-    transform: scale(1.2);
-}
-
-li span {
-    flex: 1;
+.actions button:hover {
+    background: #475569;
 }
 
 /* Responsive */
-@media (max-width: 500px) {
-    .task-input {
-        flex-direction: column;
-        gap: 10px;
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
     }
-    .task-input input, .task-input button {
+
+    .main {
+        margin-left: 0;
+    }
+
+    .stats {
+        flex-direction: column;
+    }
+
+    .task-input, .controls {
+        flex-direction: column;
+    }
+
+    button, input, select {
         width: 100%;
     }
 }
