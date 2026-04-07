@@ -1,83 +1,132 @@
 const taskInput = document.getElementById('taskInput');
 const taskTime = document.getElementById('taskTime');
+const priorityInput = document.getElementById('priority');
 const taskList = document.getElementById('taskList');
-window.onload = function() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    tasks.forEach(task => createTaskElement(task.text, task.time, task.completed));
-};
+
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+/* Render Tasks */
+function renderTasks() {
+    taskList.innerHTML = "";
+
+    const searchText = document.getElementById("searchInput")?.value.toLowerCase() || "";
+    const filterValue = document.getElementById("filter")?.value || "all";
+
+    tasks.forEach((task, index) => {
+
+        if (searchText && !task.text.toLowerCase().includes(searchText)) return;
+
+        if (filterValue === "active" && task.completed) return;
+        if (filterValue === "completed" && !task.completed) return;
+
+        const li = document.createElement('li');
+        li.classList.add(task.priority);
+        if (task.completed) li.classList.add("completed");
+
+        li.innerHTML = `
+            <div class="task-info">
+                <div class="task-title">
+                    ${task.text}
+                </div>
+                <div class="task-meta">
+                    ⏰ ${task.time || "No time"} | 
+                    <span>${task.priority}</span>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button onclick="toggleComplete(${index})">✔</button>
+                <button onclick="editTask(${index})">✏</button>
+                <button onclick="deleteTask(${index})">🗑</button>
+            </div>
+        `;
+
+        taskList.appendChild(li);
+    });
+
+    updateStats();
+}
+
+/* Add Task */
 function addTask() {
     const text = taskInput.value.trim();
     const time = taskTime.value;
+    const priority = priorityInput.value;
 
-    if(text === "") return;
+    if (!text) return;
 
-    createTaskElement(text, time, false);
-    saveTask(text, time, false);
+    tasks.push({
+        text,
+        time,
+        priority,
+        completed: false,
+        notified: false
+    });
+
+    saveTasks();
 
     taskInput.value = "";
     taskTime.value = "";
-}
-function createTaskElement(text, time, completed) {
-    const li = document.createElement('li');
-    li.innerHTML = `<span>${text} ${time ? `(${time})` : ''}</span>
-                    <div>
-                        <button onclick="toggleComplete(this)">✔️</button>
-                        <button onclick="deleteTask(this)">🗑️</button>
-                    </div>`;
-    if(completed) li.classList.add('completed');
-    taskList.appendChild(li);
+
+    renderTasks();
 }
 
-function toggleComplete(button) {
-    const li = button.closest('li');
-    li.classList.toggle('completed');
-    updateLocalStorage();
+/* Toggle Complete */
+function toggleComplete(index) {
+    tasks[index].completed = !tasks[index].completed;
+    saveTasks();
+    renderTasks();
 }
 
-function deleteTask(button) {
-    const li = button.closest('li');
-    li.remove();
-    updateLocalStorage();
+/* Delete Task */
+function deleteTask(index) {
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
 }
 
-function saveTask(text, time, completed) {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    tasks.push({ text, time, completed, notified: false });
+/* Edit Task */
+function editTask(index) {
+    const newText = prompt("Edit task:", tasks[index].text);
+    if (newText !== null) {
+        tasks[index].text = newText;
+        saveTasks();
+        renderTasks();
+    }
+}
+
+/* Save */
+function saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
 }
-function updateLocalStorage() {
-    const tasks = [];
-    document.querySelectorAll('li').forEach(li => {
-        const span = li.querySelector('span').innerText;
-        const regex = /(.*)\s\((.*)\)$/;
-        const match = span.match(regex);
-        const text = match ? match[1] : span;
-        const time = match ? match[2] : '';
-        tasks.push({
-            text: text,
-            time: time,
-            completed: li.classList.contains('completed'),
-            notified: false
-        });
-    });
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+
+/* Stats */
+function updateStats() {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const pending = total - completed;
+
+    document.getElementById("totalTasks").innerText = total;
+    document.getElementById("completedTasks").innerText = completed;
+    document.getElementById("pendingTasks").innerText = pending;
 }
+
+/* Notifications */
 function checkNotifications() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
     const now = new Date();
-    const currentTime = now.toTimeString().slice(0,5);
-
-    let updated = false;
+    const currentTime = now.toTimeString().slice(0, 5);
 
     tasks.forEach(task => {
-        if(task.time && task.time === currentTime && !task.notified && !task.completed) {
-            alert(`⏰ Task Reminder: ${task.text} at ${task.time}`);
+        if (task.time === currentTime && !task.notified && !task.completed) {
+            alert(`⏰ Reminder: ${task.text}`);
             task.notified = true;
-            updated = true;
         }
     });
 
-    if(updated) localStorage.setItem('tasks', JSON.stringify(tasks));
+    saveTasks();
 }
+
 setInterval(checkNotifications, 60000);
-checkNotifications(); 
+
+/* Initial render */
+renderTasks();
